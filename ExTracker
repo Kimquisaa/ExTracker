@@ -1,0 +1,70 @@
+from datetime import datetime
+
+class ExpenseTracker:
+    def __init__(self):
+        self.expenses = {}
+
+    def add_expense(self, category, amount, date=None):
+        if date is None:
+            date = datetime.now().strftime('%Y-%m-%d')
+        else:
+            try:
+                datetime.strptime(date, '%Y-%m-%d')
+            except ValueError:
+                print("Invalid date format. Please use YYYY-MM-DD.")
+                return
+
+        if category in self.expenses:
+            if date in self.expenses[category]:
+                self.expenses[category][date] += amount
+            else:
+                self.expenses[category][date] = amount
+        else:
+            self.expenses[category] = {date: amount}
+
+    def view_expenses(self, start_date=None, end_date=None):
+        print("Expense Tracker:")
+        for category, dates in self.expenses.items():
+            total_amount = sum(dates[date] for date in dates)
+            print(f"{category}: ${total_amount:.2f}")
+
+            if start_date and end_date:
+                filtered_dates = [date for date in dates if start_date <= date <= end_date]
+            else:
+                filtered_dates = dates.keys()
+
+            for date in filtered_dates:
+                print(f"   {date}: ${dates[date]:.2f}")
+
+# Example usage:
+tracker = ExpenseTracker()
+
+while True:
+    print("\n1. Add Expense")
+    print("2. View Expenses")
+    print("3. View Expenses in Date Range")
+    print("4. Exit")
+
+    choice = input("Enter your choice (1/2/3/4): ")
+
+    if choice == "1":
+        category = input("Enter expense category: ")
+        amount = float(input("Enter expense amount: "))
+        date = input("Enter expense date (optional, press Enter for today): ")
+        tracker.add_expense(category, amount, date)
+        print("Expense added successfully!")
+
+    elif choice == "2":
+        tracker.view_expenses()
+
+    elif choice == "3":
+        start_date = input("Enter start date (YYYY-MM-DD): ")
+        end_date = input("Enter end date (YYYY-MM-DD): ")
+        tracker.view_expenses(start_date, end_date)
+
+    elif choice == "4":
+        print("Exiting Expense Tracker. Goodbye!")
+        break
+
+    else:
+        print("Invalid choice. Please enter 1, 2, 3, or 4.")
